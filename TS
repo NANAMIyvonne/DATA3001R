@@ -1,0 +1,25 @@
+library(forecast)
+library(fUnitRoots)
+library(stats)
+setwd('D:/DATA3001/data/Will')
+train <- read.csv('NSW1_08TO19.csv')
+test <- read.csv('NSW1_2020.csv')
+
+
+rrp <- ts(train$RRP)
+unitrootTest(rrp)
+Box.test(rrp,type='Ljung-Box')
+acf(rrp)
+pacf(rrp)
+arima_rrp1 <- auto.arima(rrp,ic='bic')
+arima_rrp1
+Box.test(arima_rrp1$residuals ,type='Ljung-Box')
+arima_rrp2 <- arima(rrp,order=c(3,0,3))
+arima_rrp2
+Box.test(arima_rrp2$residuals ,type='Ljung-Box')
+forecast_rrp <- forecast(arima_rrp2,h=52417,level=c(99.5))
+pred <- data.frame(forecast_rrp$mean)
+error <- pred-test$RRP
+error_abs <- abs(error)
+mae <- mean(error_abs$forecast_rrp.mean)
+mae
